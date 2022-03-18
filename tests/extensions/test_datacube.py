@@ -1,7 +1,18 @@
 import unittest
 import pystac
 from pystac import ExtensionTypeError
-from pystac.extensions.datacube import DatacubeExtension, Variable
+from pystac.extensions.datacube import (
+    AdditionalDimension,
+    DatacubeExtension,
+    Dimension,
+    DimensionType,
+    HorizontalSpatialDimension,
+    HorizontalSpatialDimensionAxis,
+    TemporalDimension,
+    Variable,
+    VerticalSpatialDimension,
+    VerticalSpatialDimensionAxis,
+)
 
 from tests.utils import TestCases
 
@@ -87,3 +98,64 @@ class DatacubeTest(unittest.TestCase):
         self.assertEqual(
             item.properties["cube:variables"], {"temp": new_variable.to_dict()}
         )
+
+
+class HorizontalSpatialDimensionTest(unittest.TestCase):
+    def test_from_dict(self) -> None:
+        desc = "explains the dimension"
+        dim = Dimension.from_dict(
+            dict(
+                type=DimensionType.SPATIAL,
+                axis=HorizontalSpatialDimensionAxis.X,
+                description=desc,
+            )
+        )
+        self.assertIsInstance(dim, HorizontalSpatialDimension)
+        self.assertEqual(dim.description, desc)
+        self.assertEqual(dim.dim_type, DimensionType.SPATIAL)
+        self.assertEqual(dim.axis, HorizontalSpatialDimensionAxis.X)  # type: ignore
+
+        dim = Dimension.from_dict(
+            dict(
+                type=DimensionType.SPATIAL,
+                axis=HorizontalSpatialDimensionAxis.Y,
+                description=desc,
+            )
+        )
+        self.assertIsInstance(dim, HorizontalSpatialDimension)
+        self.assertEqual(dim.description, desc)
+        self.assertEqual(dim.dim_type, DimensionType.SPATIAL)
+        self.assertEqual(dim.axis, HorizontalSpatialDimensionAxis.Y)  # type: ignore
+
+
+class VerticalSpatialDimensionTest(unittest.TestCase):
+    def test_from_dict(self) -> None:
+        desc = "explains the dimension"
+        dim = Dimension.from_dict(
+            dict(
+                type=DimensionType.SPATIAL,
+                axis=VerticalSpatialDimensionAxis.Z,
+                description=desc,
+            )
+        )
+        self.assertIsInstance(dim, VerticalSpatialDimension)
+        self.assertEqual(dim.description, desc)
+        self.assertEqual(dim.dim_type, DimensionType.SPATIAL)
+        self.assertEqual(dim.axis, VerticalSpatialDimensionAxis.Z)  # type: ignore
+
+
+class TemporalDimensionTest(unittest.TestCase):
+    def test_from_dict(self) -> None:
+        desc = "explains the dimension"
+        dim = Dimension.from_dict(dict(type=DimensionType.TEMPORAL, description=desc))
+        self.assertIsInstance(dim, TemporalDimension)
+        self.assertEqual(dim.description, desc)
+        self.assertEqual(dim.dim_type, DimensionType.TEMPORAL)
+
+
+class AdditionalDimensionTest(unittest.TestCase):
+    def test_from_dict(self) -> None:
+        desc = "explains the dimension"
+        dim = Dimension.from_dict(dict(type="other", description=desc))
+        self.assertIsInstance(dim, AdditionalDimension)
+        self.assertEqual(dim.description, desc)
